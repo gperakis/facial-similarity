@@ -66,7 +66,7 @@ class ImagesLoader:
 
     def get_paths_with_targets(self,
                                fnames: List[str],
-                               include_same_image: bool = True):
+                               include_same_image: bool = True) -> pd.DataFrame:
         """
 
         :param fnames:
