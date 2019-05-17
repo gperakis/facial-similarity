@@ -140,3 +140,71 @@ class ImageProcess:
         # concatenate the original image with the K- new augmented images in a
         # 4D numpy array
         return np.array(outputs)
+
+    @staticmethod
+    def get_validation_data(image_filename: str) -> np.array:
+        """
+
+        :param image_filename:
+        :return:
+        """
+        # loading image from directory
+        img = image.load_img(image_filename,
+                             target_size=(Config.img_height,
+                                          Config.img_width))
+
+        # converting image to numpy array
+        x = image.img_to_array(img)
+
+        # normalizing the source image.
+        x_normalized = x / 255.
+
+        return x_normalized
+
+    def get_augmented_images_arrays(self,
+                                    train_data: pd.DataFrame,
+                                    n_new: int = 6):
+        """
+        'data' has 3 columns. "image1", "image2", and target.
+
+        What we want to do, is to augment each pair of images
+
+        :param train_data:
+        :param n_new:
+        :return:
+        """
+        datagen = ImageDataGenerator(**self.datagen_args)
+
+        x_left = list()
+        x_right = list()
+        targets = list()
+
+        for row in tqdm(train_data.iterrows(), desc='Augmenting Images'):
+            row_data = row[1]
+
+            img1_path = row_data['image1']
+            img2_path = row_data['image2']
+            target = row_data['target']
+
+            img1_aug = self.get_augmented(datagen,
+                                          img1_path,
+                                          n_new_samples=n_new)
+
+            img2_aug = self.get_augmented(datagen,
+                                          img2_path,
+                                          n_new_samples=n_new)
+
+            x_left.append(img1_aug)
+            x_right.append(img2_aug)
+            targets.extend([target] * (n_new + 1))
+
+        left = np.vstack(x_left)
+        right = np.vstack(x_right)
+        aug_targs = np.array(targets)
+
+        print('Augmented Images Shapes')
+        print('X augmented Left: {}'.format(left.shape))
+        print('X augmented right: {}'.format(right.shape))
+        print('Y augmented targets: {}'.format(aug_targs.shape))
+
+        return left, right, aug_targs
