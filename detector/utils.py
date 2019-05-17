@@ -39,3 +39,22 @@ def show_plot(iteration, loss):
     """
     plt.plot(iteration, loss)
     plt.show()
+
+
+def draw_image(subplot,
+               image,
+               title):
+    """
+
+    :param subplot:
+    :param image:
+    :param title:
+    :return:
+    """
+    plt.subplot(subplot)
+
+    plt.imshow(image)
+
+    plt.title(title)
+    plt.xticks([])
+    plt.yticks([])
