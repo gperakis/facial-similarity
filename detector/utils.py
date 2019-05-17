@@ -28,3 +28,14 @@ def show_image(image: np.array,
 
     plt.imshow(np.transpose(numpy_image, (1, 2, 0)))
     plt.show()
+
+
+def show_plot(iteration, loss):
+    """
+
+    :param iteration:
+    :param loss:
+    :return:
+    """
+    plt.plot(iteration, loss)
+    plt.show()
