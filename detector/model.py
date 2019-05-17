@@ -150,3 +150,12 @@ class CustomModel:
                               verbose=1)]
 
         return callbacks
+
+
+class SiameseNetworkModel(CustomModel):
+
+    def __init__(self):
+        """
+
+        """
+        super().__init__()
