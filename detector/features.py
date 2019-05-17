@@ -9,7 +9,7 @@ import pandas as pd
 from keras.preprocessing import image
 from keras.preprocessing.image import ImageDataGenerator
 from tqdm import tqdm
-
+from typing import Tuple
 from detector.config import Config
 
 pd.set_option('display.expand_frame_repr', False)
@@ -31,7 +31,7 @@ class ImageProcess:
 
     def __init__(self,
                  data: pd.DataFrame,
-                 val_size=0.2):
+                 val_size=0.3):
         """
 
         :param data:
@@ -39,3 +39,17 @@ class ImageProcess:
         """
         self.data = data
         self.val_size = val_size
+
+    def train_test_split(self) -> Tuple[pd.DataFrame, pd.DataFrame]:
+        """
+        This function splits the dataset in train and validation sets.
+        :return:
+        """
+        data_len = len(self.data)
+
+        train_size = np.floor((1 - self.val_size) * data_len)
+
+        train_data = self.data.loc[:train_size - 1]
+        val_data = self.data.loc[train_size:]
+
+        return train_data, val_data
