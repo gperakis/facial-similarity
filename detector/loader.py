@@ -126,3 +126,44 @@ class ImagesLoader:
                                random_state=seed).reset_index(drop=True)
 
         return output
+
+    def prepare_dataset(self,
+                        balance_targets: bool = True,
+                        seed: int = 5) -> pd.DataFrame:
+        """
+        wrapper method, that we use in order to get the final dataset. 
+        We need this dataset to produce the features. 
+        
+        :param balance_targets:
+        :param seed:
+        :return:
+        """
+
+        fnames = self.parse_filenames()
+
+        data = self.get_paths_with_targets(fnames)
+
+        print('Original Data size: {}'.format(len(data)))
+
+        ratios = 100 * data['target'].value_counts() / len(data['target'])
+
+        print('Targets ratio: {}'.format(ratios))
+
+        if balance_targets:
+            print('\nPerforming Sub-Sampling on Majority Label')
+
+            data = self.normalize_target_ratio(data, seed=seed)
+
+            ratios = 100 * data['target'].value_counts() / len(data['target'])
+
+            print('New Data size: {}'.format(len(data)))
+
+            print('New Targets ratio: {}'.format(ratios), end='\n\n')
+
+        return data
+
+
+if __name__ == "__main__":
+    loader = ImagesLoader(file_ext="*.jpg")
+
+    df = loader.prepare_dataset(balance_targets=True)
