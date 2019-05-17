@@ -360,3 +360,141 @@ class SiameseNetworkModel(CustomModel):
         print(model.summary())
 
         return siamese_net
+
+    def build_model_3(self,
+                      img_dimension: int = Config.img_height,
+                      dr: float = 0.3):
+        """
+
+        :param img_dimension:
+        :param dr:
+        :return:
+        """
+
+        input_shape = (img_dimension, img_dimension, 3)
+
+        # Define the tensors for the two input images
+        left_input = Input(input_shape, name='left_input')
+        right_input = Input(input_shape, name='right_input')
+
+        # Convolutional Neural Network
+        model = Sequential()
+
+        model.add(Conv2D(64, (10, 10),
+                         activation='relu',
+                         input_shape=input_shape,
+                         kernel_initializer=self.initialize_weights,
+                         kernel_regularizer=l2(2e-4)))
+
+        model.add(MaxPooling2D())
+
+        model.add(Dropout(rate=dr))
+
+        model.add(Conv2D(128, (7, 7), activation='relu',
+                         kernel_initializer=self.initialize_weights,
+                         bias_initializer=self.initialize_bias,
+                         kernel_regularizer=l2(2e-4)))
+
+        model.add(MaxPooling2D())
+
+        model.add(Dropout(rate=dr))
+
+        model.add(Conv2D(128, (4, 4),
+                         activation='relu',
+                         kernel_initializer=self.initialize_weights,
+                         bias_initializer=self.initialize_bias,
+                         kernel_regularizer=l2(2e-4)))
+
+        model.add(MaxPooling2D())
+
+        model.add(Dropout(rate=dr))
+
+        model.add(Conv2D(256, (4, 4),
+                         activation='relu',
+                         kernel_initializer=self.initialize_weights,
+                         bias_initializer=self.initialize_bias,
+                         kernel_regularizer=l2(2e-4)))
+
+        model.add(Flatten())
+
+        model.add(Dense(4096, activation='sigmoid',
+                        kernel_regularizer=l2(1e-3),
+                        kernel_initializer=self.initialize_weights,
+                        bias_initializer=self.initialize_bias))
+
+        # Generate the encodings (feature vectors) for the two images
+        encoded_l = model(left_input)
+        encoded_r = model(right_input)
+
+        # Add a customized layer to compute the absolute difference between the encodings
+        L1_layer = Lambda(lambda tensors: K.abs(tensors[0] - tensors[1]))
+
+        L1_distance = L1_layer([encoded_l, encoded_r])
+
+        # Add a dense layer with a sigmoid unit to generate the similarity score
+        prediction = Dense(1,
+                           activation='sigmoid',
+                           bias_initializer=self.initialize_bias,
+                           name='main_output')(L1_distance)
+
+        # Connect the inputs with the outputs
+        siamese_net = Model(inputs=[left_input, right_input], outputs=prediction)
+
+        # return the model
+
+        self.model = siamese_net
+
+        print(model.summary())
+
+        return siamese_net
+
+    def fit_model(self,
+                  x_left,
+                  x_right,
+                  y,
+                  x_val_left,
+                  x_val_right,
+                  y_val,
+                  e: int = 30,
+                  learning_rate: float = 0.00006,
+                  add_callbacks: bool = True,
+                  model_name: str = 'siamese_net.h5',
+                  batch_size: int = Config.train_batch_size):
+        """
+
+        :param x_left:
+        :param x_right:
+        :param y:
+        :param x_val_left:
+        :param x_val_right:
+        :param y_val:
+        :param e:
+        :param learning_rate:
+        :param add_callbacks:
+        :param model_name:
+        :param batch_size:
+        :return:
+        """
+        filepath = os.path.join(MODELS_DIR, model_name)
+
+        self.model.compile(loss=losses.binary_crossentropy,
+                           optimizer=optimizers.Adam(lr=learning_rate))
+
+        train_inp = {'left_input': x_left,
+                     'right_input': x_right}
+
+        val_inp = {'left_input': x_val_left,
+                   'right_input': x_val_right}
+
+        callbacks = list()
+
+        if add_callbacks:
+            callbacks.extend(self._add_callbacks(filepath))
+
+        history = self.model.fit(x=train_inp,
+                                 y=y,
+                                 epochs=e,
+                                 validation_data=(val_inp, y_val),
+                                 verbose=1,
+                                 batch_size=batch_size)
+        return history
