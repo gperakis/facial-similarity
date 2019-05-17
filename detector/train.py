@@ -1,8 +1,8 @@
-from detector.loader import ImagesLoader
+from detector.config import Config
 from detector.features import ImageProcess
+from detector.loader import ImagesLoader
 from detector.model import SiameseNetworkModel
 from detector.utils import plot_history
-from detector.config import Config
 
 if __name__ == "__main__":
     loader = ImagesLoader(file_ext="*.jpg")
@@ -29,6 +29,7 @@ if __name__ == "__main__":
                          x_val_left=x_left_val,
                          x_val_right=x_right_val,
                          y_val=targs_val,
-                         e=50)
+                         e=Config.train_number_epochs,
+                         add_callbacks=True)
 
     plot_history(hist)
