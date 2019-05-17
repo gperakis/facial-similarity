@@ -1,5 +1,8 @@
+#!/bin/env/python3
+# -*- encoding: utf-8 -*-
+
 """
-Custom Dataset Class
+Module for plotting images.
 """
 from __future__ import division, print_function
 
@@ -7,8 +10,8 @@ import os
 
 from keras.preprocessing.image import ImageDataGenerator
 
-from detector.utils import plot_triplet_images, plot_random_image_transformations
 from detector.config import Config
+from detector.utils import plot_triplet_images, plot_random_image_transformations
 
 if __name__ == "__main__":
     # Plotting Triplet Images

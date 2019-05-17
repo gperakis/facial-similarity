@@ -1,3 +1,6 @@
+#!/bin/env/python3
+# -*- encoding: utf-8 -*-
+
 """
 Configuration Class
 A simple class to manage configuration

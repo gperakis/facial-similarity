@@ -1,5 +1,8 @@
+#!/bin/env/python3
+# -*- encoding: utf-8 -*-
+
 """
-Custom Dataset Class
+Module responsible for loading images
 """
 from __future__ import division, print_function
 

@@ -1,4 +1,6 @@
-#!/usr/bin/env python3
+#!/bin/env/python3
+# -*- encoding: utf-8 -*-
+
 """
 Transforms app folder to python package
 """

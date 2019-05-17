@@ -1,15 +1,21 @@
-import numpy as np
-import matplotlib.pyplot as plt
+#!/bin/env/python3
+# -*- encoding: utf-8 -*-
+
 import itertools
-from sklearn import datasets
-from sklearn.preprocessing import LabelEncoder
-from sklearn.model_selection import train_test_split, KFold, GridSearchCV
-from sklearn.metrics import confusion_matrix, classification_report, accuracy_score
-from keras.models import Sequential
+
+import matplotlib.pyplot as plt
+import numpy as np
 from keras.layers import Dense
+from keras.models import Sequential
 from keras.utils import to_categorical
-from keras.wrappers.scikit_learn import KerasClassifier
-from typing import List
+from sklearn import datasets
+from sklearn.metrics import confusion_matrix, classification_report, accuracy_score
+from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import LabelEncoder
+
+# from sklearn.model_selection import KFold, GridSearchCV
+# from keras.wrappers.scikit_learn import KerasClassifier
+# from typing import List
 
 # %matplotlib inline
 # %config InlineBackend.figure_format = 'retina'

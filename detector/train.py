@@ -1,3 +1,6 @@
+#!/bin/env/python3
+# -*- encoding: utf-8 -*-
+
 from detector.config import Config
 from detector.features import ImageProcess
 from detector.loader import ImagesLoader

@@ -1,6 +1,13 @@
+#!/bin/env/python3
+# -*- encoding: utf-8 -*-
+
+"""
+Module containing the Siamese Network Class.
+"""
 import os
 
 import keras.backend as K
+import matplotlib.pyplot as plt
 import numpy as np
 from keras import models, activations, losses, optimizers
 from keras.callbacks import ModelCheckpoint, ReduceLROnPlateau, EarlyStopping, TensorBoard
@@ -13,7 +20,6 @@ from keras.regularizers import l2
 
 from detector import TENSORBOARD_LOGS_DIR, MODELS_DIR
 from detector.config import Config
-import matplotlib.pyplot as plt
 
 
 def predict_similarity_from_filename(model: Model,
