@@ -16,6 +16,70 @@ from detector.config import Config
 import matplotlib.pyplot as plt
 
 
+def predict_similarity_from_filename(model: Model,
+                                     img1_path,
+                                     img2_path,
+                                     dissimilarity_threshold: float = 0.65):
+    """
+
+    :param model:
+    :param img1_path:
+    :param img2_path:
+    :param dissimilarity_threshold:
+    :return:
+    """
+    # loading first image
+    img1 = image.load_img(img1_path,
+                          target_size=(Config.img_height,
+                                       Config.img_width))
+
+    # loading second image
+    img2 = image.load_img(img2_path,
+                          target_size=(Config.img_height,
+                                       Config.img_width))
+
+    # converting first image to array
+    img1_array = image.img_to_array(img1)
+    # normalizing first image
+    img1_array_norm = img1_array / 255.
+
+    # converting second image to array
+    img2_array = image.img_to_array(img2)
+    # normalizing second image
+    img2_array_norm = img2_array / 255.
+
+    # reshaping the first image from 3D to 4D tensor in order to be able to pass
+    # it through the trained model.
+    # (1 sample, width, height, # channels)
+    img1_array_norm = img1_array_norm.reshape((1,) + img1_array_norm.shape)
+
+    # reshaping the first image from 3D to 4D tensor in order to be able to pass
+    # it through the trained model.
+    # (1 sample, width, height, # channels)
+    img2_array_norm = img2_array_norm.reshape((1,) + img2_array_norm.shape)
+
+    # Getting the prediction.
+    # probability close to 1 for dissimilarity
+    pred = model.predict(x={'left_input': img1_array_norm,
+                            'right_input': img2_array_norm})
+
+    # plotting the two images side by side
+    f, axarr = plt.subplots(1, 2)
+    axarr[0].imshow(img1)
+    axarr[1].imshow(img2)
+    plt.show()
+
+    # Getting the actual probability of beiing dissimilar images.
+    prob = pred[0][0]
+
+    if prob > dissimilarity_threshold:
+        print('Different people')
+        return prob
+    else:
+        print('Same person')
+        return prob
+
+
 class CustomModel:
     def __init__(self):
         """
