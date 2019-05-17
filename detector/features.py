@@ -36,7 +36,7 @@ class ImageProcess:
 
     def __init__(self,
                  data: pd.DataFrame,
-                 val_size=0.2):
+                 val_size=0.25):
         """
 
         :param data:

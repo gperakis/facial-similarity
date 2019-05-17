@@ -2,10 +2,10 @@
 # -*- encoding: utf-8 -*-
 
 from detector.config import Config
+from detector.evaluation import plot_keras_history
 from detector.features import ImageProcess
 from detector.loader import ImagesLoader
 from detector.model import SiameseNetworkModel
-from detector.utils import plot_history
 
 if __name__ == "__main__":
     loader = ImagesLoader(file_ext="*.jpg")
@@ -35,4 +35,4 @@ if __name__ == "__main__":
                          e=Config.train_number_epochs,
                          add_callbacks=True)
 
-    plot_history(hist)
+    plot_keras_history(hist)
