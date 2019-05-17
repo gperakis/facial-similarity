@@ -159,3 +159,35 @@ class SiameseNetworkModel(CustomModel):
 
         """
         super().__init__()
+
+    @staticmethod
+    def initialize_weights(shape, name=None):
+        """
+        The following paper: http://www.cs.utoronto.ca/~gkoch/files/msc-thesis.pdf
+
+        suggests to initialize CNN layer weights
+        with mean as 0.0 and standard deviation of 0.01
+
+        :param shape:
+        :param name:
+        :return:
+        """
+
+        return np.random.normal(loc=0.0,
+                                scale=1e-2,
+                                size=shape)
+
+    @staticmethod
+    def initialize_bias(shape, name=None):
+        """
+        The paper, http://www.cs.utoronto.ca/~gkoch/files/msc-thesis.pdf
+        suggests to initialize CNN layer bias with mean as 0.5 and standard deviation of 0.01
+
+        :param shape:
+        :param name:
+        :return:
+        """
+
+        return np.random.normal(loc=0.5,
+                                scale=1e-2,
+                                size=shape)
