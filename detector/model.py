@@ -191,3 +191,94 @@ class SiameseNetworkModel(CustomModel):
         return np.random.normal(loc=0.5,
                                 scale=1e-2,
                                 size=shape)
+
+    def build_model_1(self,
+                      img_dimension: int = Config.img_height):
+        """
+
+        :param img_dimension:
+        :return:
+        """
+
+        input_shape = ((img_dimension ** 2) * 3,)
+
+        convolution_shape = (img_dimension, img_dimension, 3)
+
+        kernel_size_1 = (4, 4)
+
+        kernel_size_2 = (3, 3)
+
+        pool_size_1 = (3, 3)
+
+        pool_size_2 = (2, 2)
+
+        strides = 1
+
+        sequential_conv_model = [
+
+            Reshape(input_shape=input_shape,
+                    target_shape=convolution_shape),
+
+            Conv2D(32,
+                   kernel_size=kernel_size_1,
+                   strides=strides,
+                   activation=None),
+
+            LeakyReLU(alpha=0.2),
+
+            Conv2D(32,
+                   kernel_size=kernel_size_1,
+                   strides=strides,
+                   activation=None),
+
+            LeakyReLU(alpha=0.2),
+
+            MaxPooling2D(pool_size=pool_size_1,
+                         strides=strides),
+
+            Conv2D(64,
+                   kernel_size=kernel_size_2,
+                   strides=strides,
+                   activation=None),
+
+            LeakyReLU(alpha=0.2),
+
+            Conv2D(64,
+                   kernel_size=kernel_size_2,
+                   strides=strides,
+                   activation=None),
+
+            LeakyReLU(alpha=0.2),
+
+            MaxPooling2D(pool_size=pool_size_2,
+                         strides=strides),
+
+            Flatten(),
+
+            Dense(64, activation=activations.sigmoid)
+
+        ]
+
+        seq_model = Sequential(sequential_conv_model)
+
+        input_x1 = Input(shape=input_shape)
+        input_x2 = Input(shape=input_shape)
+
+        output_x1 = seq_model(input_x1)
+        output_x2 = seq_model(input_x2)
+
+        euclidean_distance = Lambda(
+            lambda tensors: K.abs(tensors[0] - tensors[1]))([output_x1,
+                                                             output_x2])
+
+        outputs = Dense(1,
+                        activation=activations.sigmoid)(euclidean_distance)
+
+        model = models.Model([input_x1,
+                              input_x2],
+                             outputs)
+
+        print(model.summary())
+
+        self.model = model
+        return self.model
