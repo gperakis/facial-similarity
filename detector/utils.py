@@ -58,3 +58,54 @@ def draw_image(subplot,
     plt.title(title)
     plt.xticks([])
     plt.yticks([])
+
+
+def plot_triplet_images(ref_image_path,
+                        sim_image_path,
+                        dif_image_path,
+                        format='pgm'):
+    """
+
+    :param ref_image_path:
+    :param sim_image_path:
+    :param dif_image_path:
+    :return:
+    """
+    ref_image = plt.imread(ref_image_path, format=format)
+    sim_image = plt.imread(sim_image_path, format=format)
+    dif_image = plt.imread(dif_image_path, format=format)
+
+    draw_image(131,
+               ref_image,
+               "Reference")
+
+    draw_image(132,
+               sim_image,
+               "Similar")
+
+    draw_image(133,
+               dif_image,
+               "Different")
+
+    plt.tight_layout()
+    plt.show()
+
+
+def plot_random_image_transformations(data_generator,
+                                      img_path):
+    sid = 150
+    np.random.seed(42)
+
+    image = plt.imread(img_path, format='jpg')
+
+    sid += 1
+
+    draw_image(sid, image, "orig")
+
+    for j in range(4):
+        augmented = data_generator.random_transform(image)
+        sid += 1
+        draw_image(sid, augmented, "aug#{:d}".format(j + 1))
+
+    plt.tight_layout()
+    plt.show()
