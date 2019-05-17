@@ -122,3 +122,47 @@ def plot_confusion_matrix(cm, classes,
     plt.ylabel('True label')
     plt.xlabel('Predicted label')
     plt.show()
+
+
+def full_multi_class_report(model,
+                            x,
+                            y_true,
+                            classes,
+                            batch_size=32,
+                            binary=False):
+    """
+    Μulti-class or binary report
+    If binary (sigmoid output), set binary parameter to True
+
+    :param model:
+    :param x:
+    :param y_true:
+    :param classes:
+    :param batch_size:
+    :param binary:
+    :return:
+    """
+    # 1. Transform one-hot encoded y_true into their class number
+    if not binary:
+        y_true = np.argmax(y_true, axis=1)
+
+    # 2. Predict classes and stores in y_pred
+    y_pred = model.predict_classes(x, batch_size=batch_size)
+
+    # 3. Print accuracy score
+    print("Accuracy: {:.3f} %".format(100 * accuracy_score(y_true, y_pred)))
+
+    print("")
+
+    # 4. Print classification report
+    print("Classification Report", end='\n\n')
+
+    print(classification_report(y_true,
+                                y_pred,
+                                digits=5))
+
+    # 5. Plot confusion matrix
+    cnf_matrix = confusion_matrix(y_true, y_pred)
+
+    plot_confusion_matrix(cnf_matrix,
+                          classes=classes)
