@@ -56,15 +56,17 @@ class ImageProcess:
 
         return train_data, val_data
 
-    def augment_images2(self, fnames, n_new: int = 6):
+    def show_augmented_images(self,
+                              img_path: str,
+                              n_new: int = 6) -> None:
         """
+        This method plots augmented images from a given image file path.
 
-        :param paths:
-        :return:
+        :param img_path: The filepath of the original image that we want to augment and plot
+        :param n_new: Number of new images to produce.
+        :return: None.
         """
         datagen = ImageDataGenerator(**self.datagen_args)
-
-        img_path = fnames[3]
 
         img = image.load_img(img_path, target_size=(Config.img_height,
                                                     Config.img_width))
@@ -74,14 +76,12 @@ class ImageProcess:
         x = x.reshape((1,) + x.shape)
 
         plt.figure(0)
-        imgplot = plt.imshow(image.array_to_img(x[0]))
 
         i = 1
-        for batch in datagen.flow(x, batch_size=1):
+        for _ in datagen.flow(x, batch_size=1):
             plt.figure(i)
-            imgplot = plt.imshow(image.array_to_img(batch[0]))
             i += 1
-            if i % 6 == 0:
+            if i % n_new == 0:
                 break
 
         plt.show()
