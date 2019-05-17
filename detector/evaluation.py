@@ -166,3 +166,129 @@ def full_multi_class_report(model,
 
     plot_confusion_matrix(cnf_matrix,
                           classes=classes)
+
+
+if __name__ == "__main__":
+    iris = datasets.load_iris()
+    x = iris.data
+    y = to_categorical(iris.target)
+    labels_names = iris.target_names
+
+    xid, yid = 0, 1
+
+    le = LabelEncoder()
+    encoded_labels = le.fit_transform(iris.target_names)
+
+    plt.scatter(x[:, xid], x[:, yid], c=y, cmap=plt.cm.Set1, edgecolor='k')
+    plt.xlabel(iris.feature_names[xid])
+    plt.ylabel(iris.feature_names[yid])
+    plt.show()
+
+    x_train, x_test, y_train, y_test = train_test_split(x,
+                                                        y,
+                                                        train_size=0.8,
+                                                        random_state=seed)
+
+    x_train, x_val, y_train, y_val = train_test_split(x_train,
+                                                      y_train,
+                                                      train_size=0.8,
+                                                      random_state=seed)
+
+    # Basic Keras Model
+    # Create a very basic MLNN with a single Dense layer.
+
+    model = Sequential()
+    model.add(Dense(8, activation='relu', input_shape=(4,)))
+    model.add(Dense(3, activation='softmax'))
+    model.compile(optimizer='rmsprop',
+                  loss='categorical_crossentropy',
+                  metrics=['accuracy'])
+
+    # hist = model.fit(x_train,
+    #                  y_train,
+    #                  epochs=200,
+    #                  batch_size=16,
+    #                  verbose=0,
+    #                  validation_data=(x_val, y_val))
+    #
+    # plot_keras_history(hist)
+    #
+    # # Full report on the Validation Set
+    # full_multi_class_report(model,
+    #                         x_val,
+    #                         y_val,
+    #                         le.inverse_transform(np.arange(3)))
+    #
+    # # Full report on the test set
+    # full_multi_class_report(model,
+    #                         x_test,
+    #                         y_test,
+    #                         le.inverse_transform(np.arange(3)))
+
+    # # Grid Search
+    # # Using grid search in keras can lead to an issue when trying to use
+    # # custom scoring with multiclass models.
+    # # Assume you creates a multiclass model as above with Iris.
+    # # With keras, you usually encode y as categorical data like this: [[0,1,0],[1,0,0], ...]
+    # # But when you try to use a custom scoring such as below:
+    #
+    # y = iris.target
+    #
+    # x_train, x_test, y_train, y_test = train_test_split(x, y, train_size=0.8, random_state=seed)
+    # x_train, x_val, y_train, y_val = train_test_split(x_train, y_train, train_size=0.8,
+    #                                                   random_state=seed)
+    #
+    #
+    # def create_model(dense_layers: List[int] = None,
+    #                  activation='relu',
+    #                  optimizer='rmsprop'):
+    #     """
+    #
+    #     :param dense_layers:
+    #     :param activation:
+    #     :param optimizer:
+    #     :return:
+    #     """
+    #     if dense_layers is None:
+    #         dense_layers = [8]
+    #
+    #     model = Sequential()
+    #
+    #     for index, lsize in enumerate(dense_layers):
+    #         # Input Layer - includes the input_shape
+    #         if index == 0:
+    #             model.add(Dense(lsize,
+    #                             activation=activation,
+    #                             input_shape=(4,)))
+    #         else:
+    #             model.add(Dense(lsize,
+    #                             activation=activation))
+    #
+    #     model.add(Dense(3, activation='softmax'))
+    #     model.compile(optimizer=optimizer,
+    #                   loss='categorical_crossentropy',
+    #                   metrics=['accuracy'])
+    #     return model
+    #
+    #
+    # model = KerasClassifier(build_fn=create_model,
+    #                         epochs=10,
+    #                         batch_size=5,
+    #                         verbose=0)
+    #
+    # param_grid = {'dense_layers': [[4], [8], [8, 8]],
+    #               'activation': ['relu', 'tanh'],
+    #               'optimizer': ('rmsprop', 'adam'),
+    #               'epochs': [10, 50],
+    #               'batch_size': [5, 16]}
+    #
+    # grid = GridSearchCV(model,
+    #                     param_grid=param_grid,
+    #                     return_train_score=True,
+    #                     scoring=['precision_macro', 'recall_macro', 'f1_macro'],
+    #                     refit='precision_macro')
+    #
+    # grid_results = grid.fit(x_train, y_train)
+    #
+    # print('Parameters of the best model: ')
+    # print(grid_results.best_params_)
