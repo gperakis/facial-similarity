@@ -31,7 +31,7 @@ class ImagesLoader:
 
         self.file_ext = file_ext
 
-    def parse_filenames(self):
+    def parse_filenames(self) -> List[str]:
         """
 
         :return:
@@ -51,3 +51,15 @@ class ImagesLoader:
                 filenames.append(fn)
 
         return filenames
+
+    @staticmethod
+    def is_different(paths) -> int:
+        """
+        Checking if the two images are from the same folder
+         (a.k.a belong to a different person)
+        :return:
+        """
+        folder1 = paths[0].split('/')[-2]
+        folder2 = paths[1].split('/')[-2]
+
+        return int(folder1 != folder2)
