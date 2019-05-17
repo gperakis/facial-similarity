@@ -282,3 +282,81 @@ class SiameseNetworkModel(CustomModel):
 
         self.model = model
         return self.model
+
+    def build_model_2(self,
+                      img_dimension: int = Config.img_height):
+        """
+
+        :param img_dimension:
+        :return:
+        """
+
+        input_shape = (img_dimension, img_dimension, 3)
+
+        # Define the tensors for the two input images
+        left_input = Input(input_shape, name='left_input')
+        right_input = Input(input_shape, name='right_input')
+
+        # Convolutional Neural Network
+        model = Sequential()
+
+        model.add(Conv2D(64, (10, 10),
+                         activation='relu',
+                         input_shape=input_shape,
+                         kernel_initializer=self.initialize_weights,
+                         kernel_regularizer=l2(2e-4)))
+
+        model.add(MaxPooling2D())
+
+        model.add(Conv2D(128, (7, 7), activation='relu',
+                         kernel_initializer=self.initialize_weights,
+                         bias_initializer=self.initialize_bias,
+                         kernel_regularizer=l2(2e-4)))
+
+        model.add(MaxPooling2D())
+        model.add(Conv2D(128, (4, 4),
+                         activation='relu',
+                         kernel_initializer=self.initialize_weights,
+                         bias_initializer=self.initialize_bias,
+                         kernel_regularizer=l2(2e-4)))
+
+        model.add(MaxPooling2D())
+
+        model.add(Conv2D(256, (4, 4),
+                         activation='relu',
+                         kernel_initializer=self.initialize_weights,
+                         bias_initializer=self.initialize_bias,
+                         kernel_regularizer=l2(2e-4)))
+
+        model.add(Flatten())
+
+        model.add(Dense(4096, activation='sigmoid',
+                        kernel_regularizer=l2(1e-3),
+                        kernel_initializer=self.initialize_weights,
+                        bias_initializer=self.initialize_bias))
+
+        # Generate the encodings (feature vectors) for the two images
+        encoded_l = model(left_input)
+        encoded_r = model(right_input)
+
+        # Add a customized layer to compute the absolute difference between the encodings
+        L1_layer = Lambda(lambda tensors: K.abs(tensors[0] - tensors[1]))
+
+        L1_distance = L1_layer([encoded_l, encoded_r])
+
+        # Add a dense layer with a sigmoid unit to generate the similarity score
+        prediction = Dense(1,
+                           activation='sigmoid',
+                           bias_initializer=self.initialize_bias,
+                           name='main_output')(L1_distance)
+
+        # Connect the inputs with the outputs
+        siamese_net = Model(inputs=[left_input, right_input], outputs=prediction)
+
+        # return the model
+
+        self.model = siamese_net
+
+        print(model.summary())
+
+        return siamese_net
