@@ -498,3 +498,54 @@ class SiameseNetworkModel(CustomModel):
                                  verbose=1,
                                  batch_size=batch_size)
         return history
+
+    def predict(self,
+                x1: np.array,
+                x2: np.array,
+                dissimilarity_threshold: float = 0.65) -> int:
+        """
+        This method, given a trained model, takes as input two images and decides
+        if the two images belong to the same person or not.
+
+        :param x1: A numpy array of 3 dimensions (height, width, # channels)
+        :param x2: A numpy array of 3 dimensions (height, width, # channels)
+        :param dissimilarity_threshold: Probability threshold that we choose to decide if the two
+                                        images belong to the same person.
+        :return: 1 for different person or 0 for the same person.
+        """
+        # checking if the image is already normalized
+        if np.max(x1) > 1:
+            # normalizing the input image
+            x1 = x1 / 255.
+
+        # reshaping the first image from 3D to 4D tensor in order to be able to pass
+        # it through the trained model. (1 sample, width, height, # channels)
+        x1 = x1.reshape((1,) + x1.shape)
+
+        # checking if the image is already normalized
+        if np.max(x2) > 1:
+            # normalizing the input image
+            x2 = x2 / 255.
+
+        # reshaping the first image from 3D to 4D tensor in order to be able to pass
+        # it through the trained model.
+        # (1 sample, width, height, # channels)
+        x2 = x2.reshape((1,) + x2.shape)
+
+        # Getting the prediction.
+        # probability close to 1 for dissimilarity
+        pred = self.model.predict(x={'left_input': x1,
+                                     'right_input': x2})
+
+        # Getting the actual probability of being dissimilar images.
+        prob = pred[0][0]
+
+        if prob > dissimilarity_threshold:
+            return 1
+        else:
+            return 0
+
+
+if __name__ == "__main__":
+    snm = SiameseNetworkModel()
+    mod2 = snm.build_model_1()
