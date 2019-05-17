@@ -53,3 +53,34 @@ class ImageProcess:
         val_data = self.data.loc[train_size:]
 
         return train_data, val_data
+
+    def augment_images2(self, fnames, n_new: int = 6):
+        """
+
+        :param paths:
+        :return:
+        """
+        # TO DO finish it
+        datagen = ImageDataGenerator(**self.datagen_args)
+
+        img_path = fnames[3]
+
+        img = image.load_img(img_path, target_size=(Config.img_height,
+                                                    Config.img_width))
+
+        x = image.img_to_array(img)
+
+        x = x.reshape((1,) + x.shape)
+
+        plt.figure(0)
+        imgplot = plt.imshow(image.array_to_img(x[0]))
+
+        i = 1
+        for batch in datagen.flow(x, batch_size=1):
+            plt.figure(i)
+            imgplot = plt.imshow(image.array_to_img(batch[0]))
+            i += 1
+            if i % 6 == 0:
+                break
+
+        plt.show()
