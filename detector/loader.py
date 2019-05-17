@@ -97,3 +97,32 @@ class ImagesLoader:
                              'target': targets})
 
         return data
+
+    @staticmethod
+    def normalize_target_ratio(data: pd.DataFrame,
+                               seed: int = 5) -> pd.DataFrame:
+        """
+        This method under-samples the majority class (1's) is order to have a
+        more balanced dataset.
+
+        :param data:
+        :param seed:
+        :return:
+        """
+
+        different = data[data['target'] == 1]
+        similar = data[data['target'] == 0]
+
+        # sub-sampling the target == 1
+        different = different.sample(n=len(similar),
+                                     replace=False,
+                                     random_state=seed)
+
+        # concatenating the sub-sampled 1's with the 0's
+        output = pd.concat([different, similar])
+
+        # shuffling the data
+        output = output.sample(frac=1,
+                               random_state=seed).reset_index(drop=True)
+
+        return output
