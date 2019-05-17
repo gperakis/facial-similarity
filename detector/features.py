@@ -3,13 +3,14 @@ Custom Dataset Class
 """
 from __future__ import division, print_function
 
+from typing import Tuple
+
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 from keras.preprocessing import image
 from keras.preprocessing.image import ImageDataGenerator
 from tqdm import tqdm
-from typing import Tuple
 
 from detector.config import Config
 
@@ -161,9 +162,12 @@ class ImageProcess:
 
         return x_normalized
 
-    def get_augmented_images_arrays(self,
-                                    train_data: pd.DataFrame,
-                                    n_new: int = 6):
+    def get_augmented_images_arrays(
+            self,
+            train_data: pd.DataFrame,
+            n_new: int = 6) -> Tuple[np.array,
+                                     np.array,
+                                     np.array]:
         """
         'data' has 3 columns. "image1", "image2", and target.
 
@@ -208,3 +212,43 @@ class ImageProcess:
         print('Y augmented targets: {}'.format(aug_targs.shape))
 
         return left, right, aug_targs
+
+    def get_validation_images_arrays(self,
+                                     val_data: pd.DataFrame) -> Tuple[np.array,
+                                                                      np.array,
+                                                                      np.array]:
+        """
+        'data' has 3 columns. "image1", "image2", and target.
+
+        :param val_data:
+        :return:
+        """
+
+        x_left = list()
+        x_right = list()
+        targets = list()
+
+        for row in tqdm(val_data.iterrows(),
+                        desc='Converting Filenames to arrays'):
+            row_data = row[1]
+
+            target = row_data['target']
+
+            img1_aug = self.get_validation_data(row_data['image1'])
+
+            img2_aug = self.get_validation_data(row_data['image2'])
+
+            x_left.append(img1_aug)
+            x_right.append(img2_aug)
+            targets.append(target)
+        #
+        left = np.array(x_left)
+        right = np.array(x_right)
+        targets = np.array(targets)
+
+        print('X Validation Images Shapes')
+        print('X Left: {}'.format(left.shape))
+        print('X Right: {}'.format(right.shape))
+        print('Y targets: {}'.format(targets.shape))
+
+        return left, right, targets
